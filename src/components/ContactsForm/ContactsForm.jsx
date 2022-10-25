@@ -1,10 +1,16 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import actions from 'components/redux/actions';
+import { getContacts } from 'components/redux/selectors';
 
 import { Form, Container, Label, Input, Button } from './ContactsForm.styled';
 
-export function ContactsForm({ onSubmit}) {
+export const ContactsForm = () => {
   const [name, setName] = useState('');
   const [number, setNumber] = useState('');
+
+  const dispatch = useDispatch();
+  const contacts = useSelector(getContacts);
 
 
   const handleInputChange = event => {
@@ -24,14 +30,22 @@ export function ContactsForm({ onSubmit}) {
   };
 
 
-  const handleSubmit = event => {
+const handleSubmit = event => {
     event.preventDefault();
-    onSubmit({
-      name,
-      number,
-    });
-    setName('');
-    setNumber('')
+
+    const isContact = contacts.find(contact => contact.name === name);
+    if (isContact) {
+      alert(`${name} is already in contact`);
+    } else {
+      dispatch(
+        actions.contactAdd({
+          name,
+          number,
+        }),
+      );
+      setName('');
+      setNumber('');
+    }
   };
 
 
@@ -68,4 +82,4 @@ export function ContactsForm({ onSubmit}) {
         </Container>
       </Form>
     );
-  }
+}
